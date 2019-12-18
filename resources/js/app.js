@@ -1,41 +1,18 @@
 require('./bootstrap');
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import App from './App';
+import routes from './routes';
 
-window.Vue = require('vue');
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.use(VueRouter);
 
-class Errors {
-    constructor() {
-        this.errors = {};
-    }
+const router = new VueRouter({
+    mode: 'history',
+    routes,
+});
 
-    get(field) {
-        if (this.errors[field]) {
-            return this.errors[field][0];
-        }
-    }
-
-    record(errors) {
-        this.errors = errors.errors;
-    }
-}
-
-const app = new Vue({
+new Vue({
     el: '#app',
-    data: {
-        fields: {},
-        errors: new Errors(),
-        errorStatus: false,
-    },
-    methods: {
-        submit() {
-            axios.post('/register', this.fields).then(response => {
-                console.log('Success');
-            }).catch(error => {
-                if (error.response.status === 422) {
-                    this.errors.record(error.response.data) || {};
-                    this.errorStatus = true;
-                }
-            });
-        }
-    }
+    render: h => h(App),
+    router,
 });
