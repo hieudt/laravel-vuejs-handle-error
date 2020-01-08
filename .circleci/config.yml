@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: framgia/laravel-workspace
+    steps:
+      - checkout
+      - run: cp .env.example .env
+
+      # composer cache
+      - restore_cache:
+          keys:
+            - vendor-v1-{{ checksum "composer.lock" }}
+      - run:  composer install
+      - save_cache:
+          key: vendor-v1-{{ checksum "composer.lock" }}
+          paths:
+            - vendor
+
+      # run test
+      - run: phpcs --standard=Framgia app
